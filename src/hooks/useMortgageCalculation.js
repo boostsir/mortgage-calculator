@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import Decimal from 'decimal.js';
 import { calculateMonthlyPayment, calculateAmortizationSchedule, calculatePMI } from '../utils/mortgageUtils';
 
 export function useMortgageCalculation(inputs) {
@@ -28,13 +29,14 @@ export function useMortgageCalculation(inputs) {
       };
     }
 
-    // Convert percentage inputs to dollar amounts
+    // Convert percentage inputs to dollar amounts using Decimal for precision
+    const homePriceDecimal = new Decimal(homePrice);
     const downPaymentDollars = downPaymentType === 'percent' 
-      ? (downPayment / 100) * homePrice 
+      ? new Decimal(downPayment).div(100).mul(homePriceDecimal).toNumber()
       : downPayment;
 
     // Property tax is always in percentage
-    const propertyTaxDollars = (propertyTax / 100) * homePrice;
+    const propertyTaxDollars = new Decimal(propertyTax).div(100).mul(homePriceDecimal).toNumber();
 
     // Calculate basic mortgage values
     const mortgageResults = calculateMonthlyPayment({
@@ -55,31 +57,30 @@ export function useMortgageCalculation(inputs) {
       loanTerm
     });
 
-    // Calculate monthly components
-    const monthlyPropertyTax = propertyTaxDollars / 12;
-    const monthlyHomeInsurance = homeInsurance / 12;
-    const monthlyHoaFee = hoaFee;
+    // Calculate monthly components using Decimal for precision
+    const monthlyPropertyTax = new Decimal(propertyTaxDollars).div(12);
+    const monthlyHomeInsurance = new Decimal(homeInsurance).div(12);
+    const monthlyHoaFee = new Decimal(hoaFee);
 
     // Calculate total monthly payment
-    const totalMonthlyPayment = 
-      mortgageResults.monthlyPayment + 
-      pmi + 
-      monthlyPropertyTax + 
-      monthlyHomeInsurance + 
-      monthlyHoaFee;
+    const totalMonthlyPayment = new Decimal(mortgageResults.monthlyPayment)
+      .plus(pmi)
+      .plus(monthlyPropertyTax)
+      .plus(monthlyHomeInsurance)
+      .plus(monthlyHoaFee);
 
     // Create breakdown object
     const breakdown = {
       principal: mortgageResults.monthlyPayment,
-      propertyTax: Math.round(monthlyPropertyTax * 100) / 100,
-      homeInsurance: Math.round(monthlyHomeInsurance * 100) / 100,
-      hoaFee: monthlyHoaFee,
+      propertyTax: monthlyPropertyTax.toDecimalPlaces(2).toNumber(),
+      homeInsurance: monthlyHomeInsurance.toDecimalPlaces(2).toNumber(),
+      hoaFee: monthlyHoaFee.toNumber(),
       pmi: pmi
     };
 
     return {
       monthlyPayment: mortgageResults.monthlyPayment,
-      totalMonthlyPayment: Math.round(totalMonthlyPayment * 100) / 100,
+      totalMonthlyPayment: totalMonthlyPayment.toDecimalPlaces(2).toNumber(),
       totalInterest: mortgageResults.totalInterest,
       totalPayments: mortgageResults.totalPayments,
       amortizationSchedule,

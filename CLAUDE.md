@@ -1,3 +1,7 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 # Claude Development Guidelines
 
 ## Development Approach
@@ -26,7 +30,7 @@ Never write production code without a failing test first.
 - npm/yarn package manager
 
 **Core Libraries:**
-- `mortgage-js` for calculations
+- `decimal.js` for high-precision calculations (replaces mortgage-js)
 - `qrcode` for sharing functionality
 
 ### Key Features to Implement
@@ -100,33 +104,79 @@ src/
 - Error states: `border-red-500 text-red-600`
 - Collapsible: `transition-all duration-300`
 
-### Development Commands
+## Development Commands
 
-Run tests: `npm test`
-Start development: `npm start`
-Build production: `npm run build`
-Preview production: `npm run preview`
-Deploy to GitHub Pages: `npm run deploy` (after setup)
+**Common Commands:**
+- `npm run dev` - Start Vite development server
+- `npm test` - Run Jest tests once
+- `npm run test:watch` - Run Jest tests in watch mode
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build locally
+- `npm run lint` - Run ESLint
+- `npm run deploy` - Deploy to GitHub Pages
+
+**Single Test Execution:**
+- `npm test -- --testNamePattern="test name"` - Run specific test
+- `npm test -- src/utils/__tests__/mortgageUtils.test.js` - Run specific test file
+
+**Test Coverage:**
+- Coverage is configured in jest.config.js and excludes main.jsx and setupTests.js
+
+## Architecture Overview
+
+The application implements a custom mortgage calculation engine using decimal.js for precision instead of mortgage-js. Key architectural decisions:
+
+**Calculation Engine (src/utils/mortgageUtils.js):**
+- Uses Decimal.js for all financial calculations to avoid floating-point errors
+- Implements standard mortgage formula: P = L[c(1 + c)^n]/[(1 + c)^n - 1]
+- Handles PMI calculation (0.6% annually if LTV > 80%)
+- Generates complete amortization schedules
+
+**State Management (src/hooks/useMortgageCalculation.js):**
+- Custom hook that memoizes calculations using useMemo
+- Handles input validation and type conversion (percentage to dollar amounts)
+- Returns complete calculation results including breakdowns
+
+**Precision Handling:**
+- All currency values use Decimal.js with 2 decimal places
+- Property tax input is percentage-based, converted to annual dollar amount
+- Down payment supports both dollar amounts and percentages
+
+## Build Configuration
+
+**Vite Configuration (vite.config.js):**
+- Configured for GitHub Pages deployment with base: '/mortgage-calculator/'
+- React plugin enabled
+- Output directory: 'dist'
+
+**Jest Configuration (jest.config.js):**
+- jsdom test environment for React components
+- Babel transformation for JSX
+- CSS modules mocked with identity-obj-proxy
+- Test files in __tests__ folders or *.test.js pattern
+
+**ESLint Configuration:**
+- React and React Hooks plugins enabled
+- ES6+ syntax support
 
 ### TDD Workflow Example
 
 ```javascript
 // 1. RED - Write failing test
 test('should calculate monthly payment correctly', () => {
-  const result = calculateMonthlyPayment(500000, 100000, 7.5, 30);
+  const result = calculateMonthlyPayment({
+    homePrice: 500000,
+    downPayment: 100000,
+    interestRate: 7.5,
+    loanTerm: 30
+  });
   expect(result.monthlyPayment).toBe(2797.19);
 });
 
-// 2. GREEN - Write minimal code to pass
-function calculateMonthlyPayment(homePrice, downPayment, rate, term) {
-  // Minimal implementation using mortgage-js
-  return { monthlyPayment: 2797.19 };
-}
-
-// 3. REFACTOR - Improve implementation
-function calculateMonthlyPayment(homePrice, downPayment, rate, term) {
-  const mortgage = require('mortgage-js');
-  // Full implementation
+// 2. GREEN - Write minimal code to pass using Decimal.js
+function calculateMonthlyPayment({ homePrice, downPayment, interestRate, loanTerm }) {
+  const loanAmount = new Decimal(homePrice).minus(downPayment);
+  // Implement mortgage formula with Decimal.js
 }
 ```
 
