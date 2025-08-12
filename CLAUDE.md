@@ -105,6 +105,8 @@ src/
 Run tests: `npm test`
 Start development: `npm start`
 Build production: `npm run build`
+Preview production: `npm run preview`
+Deploy to GitHub Pages: `npm run deploy` (after setup)
 
 ### TDD Workflow Example
 

@@ -3,7 +3,9 @@
     "allow": [
       "Bash(npx create-react-app:*)",
       "WebFetch(domain:github.com)",
-      "WebFetch(domain:react.dev)"
+      "WebFetch(domain:react.dev)",
+      "WebFetch(domain:vitejs.dev)",
+      "WebFetch(domain:vite.dev)"
     ],
     "deny": []
   }

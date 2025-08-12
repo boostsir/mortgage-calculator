@@ -316,7 +316,112 @@ npm start
 
 # Build for production
 npm run build
+
+# Preview production build locally
+npm run preview
+
+# Deploy to GitHub Pages (manual)
+npm run build && npm run deploy
 ```
+
+### Vite Configuration for GitHub Pages
+
+```js
+// vite.config.js
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+  base: '/mortgage-calculator/', // Replace with your repo name
+  build: {
+    outDir: 'dist'
+  }
+})
+```
+
+## Deployment to GitHub Pages
+
+### Automatic Deployment with GitHub Actions
+
+Create `.github/workflows/deploy.yml` in your repository:
+
+```yaml
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: ['main']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'pages'
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run tests
+        run: npm test -- --watchAll=false
+      
+      - name: Build
+        run: npm run build
+      
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'
+      
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+```
+
+### Manual Deployment Setup
+
+Add to `package.json` scripts:
+
+```json
+{
+  "scripts": {
+    "deploy": "gh-pages -d dist"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.0.0"
+  }
+}
+```
+
+### Repository Settings
+
+1. Go to your GitHub repository settings
+2. Navigate to Pages section
+3. Set Source to "GitHub Actions"
+4. Your app will be available at: `https://yourusername.github.io/mortgage-calculator/`
 
 ## Removed Features
 
