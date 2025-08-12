@@ -22,7 +22,7 @@ Never write production code without a failing test first.
 - React (functional components + hooks)
 - Tailwind CSS
 - JavaScript (NO TypeScript)
-- Create React App or Vite
+- Vite (preferred) or Next.js
 - npm/yarn package manager
 
 **Core Libraries:**

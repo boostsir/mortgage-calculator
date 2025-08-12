@@ -17,7 +17,8 @@ Build a pure frontend mortgage calculator web application specifically designed 
 
 - **Frontend Framework**: React (with functional components and hooks)
 - **Styling**: Tailwind CSS
-- **Build Tool**: Create React App or Vite
+- **Language**: JavaScript only (NO TypeScript)
+- **Build Tool**: Vite (preferred) or Next.js
 - **Package Manager**: npm or yarn
 
 ## Available Libraries to Consider
@@ -135,7 +136,7 @@ https://yourdomain.com/?price=500000&down=100000&rate=7.5&term=30&tax=8000&insur
 
 ## Component Architecture
 
-### Suggested React Component Structure
+### React Component Structure
 
 ```
 src/
@@ -221,6 +222,54 @@ const useMortgageCalculation = (inputs) => {
 };
 ```
 
+## Testing Strategy
+
+### Test-Driven Development (TDD)
+
+**STRICTLY FOLLOW TDD APPROACH:**
+
+1. **Red**: Write a failing test first
+2. **Green**: Write minimal code to pass the test
+3. **Refactor**: Improve code while keeping tests green
+
+Never write production code without a failing test first.
+
+### Test Files Structure
+
+- `__tests__/` folder for each component
+- `*.test.js` naming convention
+- Use Jest + React Testing Library
+
+### Testing Requirements
+
+1. Test all calculation logic thoroughly
+2. Test component rendering and interactions
+3. Test URL parameter handling
+4. Test form validation
+5. Test collapsible section behavior
+
+### TDD Workflow Example
+
+```javascript
+// 1. RED - Write failing test
+test('should calculate monthly payment correctly', () => {
+  const result = calculateMonthlyPayment(500000, 100000, 7.5, 30);
+  expect(result.monthlyPayment).toBe(2797.19);
+});
+
+// 2. GREEN - Write minimal code to pass
+function calculateMonthlyPayment(homePrice, downPayment, rate, term) {
+  // Minimal implementation using mortgage-js
+  return { monthlyPayment: 2797.19 };
+}
+
+// 3. REFACTOR - Improve implementation
+function calculateMonthlyPayment(homePrice, downPayment, rate, term) {
+  const mortgage = require('mortgage-js');
+  // Full implementation
+}
+```
+
 ## Development Setup
 
 ### Dependencies
@@ -246,7 +295,7 @@ const useMortgageCalculation = (inputs) => {
 ```js
 // tailwind.config.js
 module.exports = {
-  content: ["./src/**/*.{js,jsx,ts,tsx}"],
+  content: ["./src/**/*.{js,jsx}"],
   theme: {
     extend: {
       // Custom colors for mortgage calculator theme
@@ -254,6 +303,19 @@ module.exports = {
   },
   plugins: [],
 };
+```
+
+### Development Commands
+
+```bash
+# Run tests
+npm test
+
+# Start development server
+npm start
+
+# Build for production
+npm run build
 ```
 
 ## Removed Features
