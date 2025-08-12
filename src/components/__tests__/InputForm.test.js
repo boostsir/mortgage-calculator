@@ -8,9 +8,10 @@ describe('InputForm', () => {
     values: {
       homePrice: 500000,
       downPayment: 100000,
+      downPaymentType: 'dollar', // 'dollar' or 'percent'
       interestRate: 7.5,
       loanTerm: 30,
-      propertyTax: 8000,
+      propertyTax: 1.6, // always percentage now
       homeInsurance: 1200,
       hoaFee: 200
     },
@@ -136,5 +137,49 @@ describe('InputForm', () => {
       'focus:ring-2',
       'focus:ring-blue-500'
     );
+  });
+
+  test('should show down payment type toggle buttons', () => {
+    render(<InputForm {...defaultProps} />);
+
+    // Should have $ and % buttons for down payment toggle
+    const dollarButtons = screen.getAllByText('$');
+    const percentButtons = screen.getAllByText('%');
+    
+    expect(dollarButtons).toHaveLength(1);
+    expect(percentButtons).toHaveLength(1);
+  });
+
+  test('should handle down payment type change', () => {
+    const onChange = jest.fn();
+    render(<InputForm {...defaultProps} onChange={onChange} />);
+
+    const percentButton = screen.getByRole('button', { name: '%' });
+    fireEvent.click(percentButton);
+
+    expect(onChange).toHaveBeenCalledWith('downPaymentType', 'percent');
+  });
+
+  test('should show correct input labels based on type', () => {
+    render(<InputForm {...defaultProps} />);
+
+    expect(screen.getByLabelText(/down payment.*\$/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/property tax.*% annual/i)).toBeInTheDocument();
+  });
+
+  test('should calculate percentage when type is percent', () => {
+    const propsWithPercent = {
+      ...defaultProps,
+      values: {
+        ...defaultProps.values,
+        downPaymentType: 'percent',
+        downPayment: 20 // 20%
+      }
+    };
+
+    render(<InputForm {...propsWithPercent} />);
+
+    const downPaymentInput = screen.getByLabelText(/down payment/i);
+    expect(downPaymentInput).toHaveValue(20);
   });
 });

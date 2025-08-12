@@ -3,6 +3,7 @@ import { useMemo, useCallback } from 'react';
 const PARAM_MAP = {
   price: 'homePrice',
   down: 'downPayment',
+  downType: 'downPaymentType',
   rate: 'interestRate',
   term: 'loanTerm',
   tax: 'propertyTax',
@@ -22,9 +23,17 @@ export function useUrlParams() {
     for (const [urlKey, stateKey] of Object.entries(PARAM_MAP)) {
       const value = urlParams.get(urlKey);
       if (value !== null && value !== '') {
-        const numValue = parseFloat(value);
-        if (!isNaN(numValue)) {
-          result[stateKey] = numValue;
+        // Handle type fields as strings
+        if (stateKey.includes('Type')) {
+          if (value === 'dollar' || value === 'percent') {
+            result[stateKey] = value;
+          }
+        } else {
+          // Handle numeric fields
+          const numValue = parseFloat(value);
+          if (!isNaN(numValue)) {
+            result[stateKey] = numValue;
+          }
         }
       }
     }
@@ -37,8 +46,11 @@ export function useUrlParams() {
 
     for (const [stateKey, value] of Object.entries(newParams)) {
       const urlKey = REVERSE_PARAM_MAP[stateKey];
-      if (urlKey && value !== undefined && value !== null && value !== 0) {
-        searchParams.set(urlKey, value.toString());
+      if (urlKey && value !== undefined && value !== null) {
+        // Include type fields even if they're not default
+        if (stateKey.includes('Type') || (value !== 0 && value !== '')) {
+          searchParams.set(urlKey, value.toString());
+        }
       }
     }
 
@@ -51,8 +63,11 @@ export function useUrlParams() {
 
     for (const [stateKey, value] of Object.entries(params)) {
       const urlKey = REVERSE_PARAM_MAP[stateKey];
-      if (urlKey && value !== undefined && value !== null && value !== 0) {
-        searchParams.set(urlKey, value.toString());
+      if (urlKey && value !== undefined && value !== null) {
+        // Include type fields even if they're not default
+        if (stateKey.includes('Type') || (value !== 0 && value !== '')) {
+          searchParams.set(urlKey, value.toString());
+        }
       }
     }
 

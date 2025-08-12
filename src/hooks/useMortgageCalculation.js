@@ -5,6 +5,7 @@ export function useMortgageCalculation(inputs) {
   const {
     homePrice,
     downPayment,
+    downPaymentType = 'dollar',
     interestRate,
     loanTerm,
     propertyTax = 0,
@@ -27,27 +28,35 @@ export function useMortgageCalculation(inputs) {
       };
     }
 
+    // Convert percentage inputs to dollar amounts
+    const downPaymentDollars = downPaymentType === 'percent' 
+      ? (downPayment / 100) * homePrice 
+      : downPayment;
+
+    // Property tax is always in percentage
+    const propertyTaxDollars = (propertyTax / 100) * homePrice;
+
     // Calculate basic mortgage values
     const mortgageResults = calculateMonthlyPayment({
       homePrice,
-      downPayment,
+      downPayment: downPaymentDollars,
       interestRate,
       loanTerm
     });
 
     // Calculate PMI
-    const pmi = calculatePMI(homePrice, downPayment);
+    const pmi = calculatePMI(homePrice, downPaymentDollars);
 
     // Calculate amortization schedule
     const amortizationSchedule = calculateAmortizationSchedule({
       homePrice,
-      downPayment,
+      downPayment: downPaymentDollars,
       interestRate,
       loanTerm
     });
 
     // Calculate monthly components
-    const monthlyPropertyTax = propertyTax / 12;
+    const monthlyPropertyTax = propertyTaxDollars / 12;
     const monthlyHomeInsurance = homeInsurance / 12;
     const monthlyHoaFee = hoaFee;
 
@@ -78,5 +87,5 @@ export function useMortgageCalculation(inputs) {
       pmi,
       breakdown
     };
-  }, [homePrice, downPayment, interestRate, loanTerm, propertyTax, homeInsurance, hoaFee]);
+  }, [homePrice, downPayment, downPaymentType, interestRate, loanTerm, propertyTax, homeInsurance, hoaFee]);
 }

@@ -8,6 +8,39 @@ export function InputForm({ values, onChange, errors = {} }) {
     onChange(field, finalValue);
   };
 
+  const handleTypeToggle = (field, type) => {
+    onChange(field, type);
+  };
+
+  const renderTypeToggle = (currentType, onTypeChange) => {
+    return (
+      <div className="flex rounded-md shadow-sm">
+        <button
+          type="button"
+          onClick={() => onTypeChange('dollar')}
+          className={`px-3 py-2 text-sm font-medium border border-r-0 rounded-l-md ${
+            currentType === 'dollar'
+              ? 'bg-blue-600 text-white border-blue-600'
+              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+          }`}
+        >
+          $
+        </button>
+        <button
+          type="button"
+          onClick={() => onTypeChange('percent')}
+          className={`px-3 py-2 text-sm font-medium border rounded-r-md ${
+            currentType === 'percent'
+              ? 'bg-blue-600 text-white border-blue-600'
+              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+          }`}
+        >
+          %
+        </button>
+      </div>
+    );
+  };
+
   const getInputClassName = (field) => {
     const baseClasses = 'border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full';
     const errorClasses = errors[field] ? 'border-red-500' : 'border-gray-300';
@@ -48,16 +81,27 @@ export function InputForm({ values, onChange, errors = {} }) {
 
           <div>
             <label htmlFor="downPayment" className="block text-sm font-medium text-gray-700 mb-1">
-              Down Payment *
+              Down Payment ({values.downPaymentType === 'percent' ? '%' : '$'}) *
             </label>
-            <input
-              id="downPayment"
-              type="number"
-              value={values.downPayment || ''}
-              onChange={(e) => handleInputChange('downPayment', e.target.value)}
-              className={getInputClassName('downPayment')}
-              placeholder="100,000"
-            />
+            <div className="flex gap-2 items-center">
+              <div className="flex-1">
+                <input
+                  id="downPayment"
+                  type="number"
+                  step={values.downPaymentType === 'percent' ? '0.1' : '1000'}
+                  value={values.downPayment || ''}
+                  onChange={(e) => handleInputChange('downPayment', e.target.value)}
+                  className={getInputClassName('downPayment')}
+                  placeholder={values.downPaymentType === 'percent' ? '20' : '100,000'}
+                />
+              </div>
+              <div className="flex-shrink-0">
+                {renderTypeToggle(
+                  values.downPaymentType || 'dollar',
+                  (type) => handleTypeToggle('downPaymentType', type)
+                )}
+              </div>
+            </div>
             {errors.downPayment && (
               <p className="text-red-600 text-sm mt-1">{errors.downPayment}</p>
             )}
@@ -111,15 +155,16 @@ export function InputForm({ values, onChange, errors = {} }) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label htmlFor="propertyTax" className="block text-sm font-medium text-gray-700 mb-1">
-                Property Tax (Annual)
+                Property Tax (% Annual)
               </label>
               <input
                 id="propertyTax"
                 type="number"
+                step="0.01"
                 value={values.propertyTax || ''}
                 onChange={(e) => handleInputChange('propertyTax', e.target.value)}
                 className={getInputClassName('propertyTax')}
-                placeholder="8,000"
+                placeholder="1.6"
               />
               {errors.propertyTax && (
                 <p className="text-red-600 text-sm mt-1">{errors.propertyTax}</p>

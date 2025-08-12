@@ -12,6 +12,7 @@ export function MortgageCalculator() {
   const [inputs, setInputs] = useState({
     homePrice: 0,
     downPayment: 0,
+    downPaymentType: 'dollar',
     interestRate: 0,
     loanTerm: 0,
     propertyTax: 0,
@@ -45,10 +46,17 @@ export function MortgageCalculator() {
       case 'downPayment':
         if (!value || value <= 0) {
           newErrors.downPayment = 'Down payment must be greater than 0';
-        } else if (value >= inputs.homePrice) {
-          newErrors.downPayment = 'Down payment must be less than home price';
         } else {
-          delete newErrors.downPayment;
+          const downPaymentDollars = inputs.downPaymentType === 'percent' 
+            ? (value / 100) * inputs.homePrice 
+            : value;
+          if (downPaymentDollars >= inputs.homePrice) {
+            newErrors.downPayment = inputs.downPaymentType === 'percent' 
+              ? 'Down payment percentage must be less than 100%'
+              : 'Down payment must be less than home price';
+          } else {
+            delete newErrors.downPayment;
+          }
         }
         break;
       case 'interestRate':
@@ -81,14 +89,23 @@ export function MortgageCalculator() {
   };
 
   const handleInputChange = (field, value) => {
-    const numValue = value === '' ? 0 : (typeof value === 'string' ? parseFloat(value) || 0 : value);
+    // Type fields should remain as strings, numeric fields should be converted to numbers
+    let finalValue;
+    if (field.includes('Type')) {
+      finalValue = value; // Keep type fields as strings
+    } else {
+      finalValue = value === '' ? 0 : (typeof value === 'string' ? parseFloat(value) || 0 : value);
+    }
     
     setInputs(prev => ({
       ...prev,
-      [field]: numValue
+      [field]: finalValue
     }));
 
-    validateInputs(field, numValue);
+    // Only validate numeric fields
+    if (!field.includes('Type')) {
+      validateInputs(field, finalValue);
+    }
   };
 
   const hasValidInputs = inputs.homePrice > 0 && inputs.downPayment > 0 && 
