@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { InputForm } from './InputForm';
 import { ResultsSummary } from './ResultsSummary';
 import { PaymentBreakdown } from './PaymentBreakdown';
+import { AmortizationTable } from './AmortizationTable';
 import { ShareButton } from './ShareButton';
 import { useMortgageCalculation } from '../hooks/useMortgageCalculation';
 import { useUrlParams } from '../hooks/useUrlParams';
@@ -136,6 +137,10 @@ export function MortgageCalculator() {
               
               {hasValidInputs && results.breakdown && (
                 <PaymentBreakdown breakdown={results.breakdown} />
+              )}
+              
+              {hasValidInputs && results.amortizationSchedule && (
+                <AmortizationTable schedule={results.amortizationSchedule} />
               )}
             </div>
 
