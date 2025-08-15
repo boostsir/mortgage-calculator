@@ -8,6 +8,22 @@ export function InputForm({ values, onChange, errors = {} }) {
     onChange(field, finalValue);
   };
 
+  const getDownPaymentEquivalent = () => {
+    const { homePrice, downPayment, downPaymentType } = values;
+    
+    if (!homePrice || !downPayment) return null;
+    
+    if (downPaymentType === 'percent') {
+      // Show dollar equivalent
+      const dollarAmount = (parseFloat(homePrice) * parseFloat(downPayment)) / 100;
+      return `$${dollarAmount.toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
+    } else {
+      // Show percentage equivalent
+      const percentage = (parseFloat(downPayment) / parseFloat(homePrice)) * 100;
+      return `${percentage % 1 === 0 ? percentage.toFixed(0) : percentage.toFixed(1)}%`;
+    }
+  };
+
   const handleTypeToggle = (field, type) => {
     onChange(field, type);
   };
@@ -104,6 +120,11 @@ export function InputForm({ values, onChange, errors = {} }) {
             </div>
             {errors.downPayment && (
               <p className="text-red-600 text-sm mt-1">{errors.downPayment}</p>
+            )}
+            {getDownPaymentEquivalent() && (
+              <p className="text-gray-600 text-sm mt-1">
+                {getDownPaymentEquivalent()}
+              </p>
             )}
           </div>
 

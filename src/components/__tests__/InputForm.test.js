@@ -182,4 +182,67 @@ describe('InputForm', () => {
     const downPaymentInput = screen.getByLabelText(/down payment/i);
     expect(downPaymentInput).toHaveValue(20);
   });
+
+  test('should show dollar equivalent when percentage is entered', () => {
+    const propsWithPercent = {
+      ...defaultProps,
+      values: {
+        homePrice: 500000,
+        downPayment: 20,
+        downPaymentType: 'percent'
+      }
+    };
+    
+    render(<InputForm {...propsWithPercent} />);
+    
+    // Should show dollar equivalent ($100,000) when 20% is entered
+    expect(screen.getByText('$100,000')).toBeInTheDocument();
+  });
+
+  test('should show percentage equivalent when dollar amount is entered', () => {
+    const propsWithDollar = {
+      ...defaultProps,
+      values: {
+        homePrice: 500000,
+        downPayment: 100000,
+        downPaymentType: 'dollar'
+      }
+    };
+    
+    render(<InputForm {...propsWithDollar} />);
+    
+    // Should show percentage equivalent (20%) when $100,000 is entered
+    expect(screen.getByText('20%')).toBeInTheDocument();
+  });
+
+  test('should not show equivalent when home price is not entered', () => {
+    const propsWithoutHomePrice = {
+      ...defaultProps,
+      values: {
+        downPayment: 100000,
+        downPaymentType: 'dollar'
+      }
+    };
+    
+    render(<InputForm {...propsWithoutHomePrice} />);
+    
+    // Should not show equivalent when home price is missing
+    expect(screen.queryByText(/20%/)).not.toBeInTheDocument();
+  });
+
+  test('should handle decimal percentages correctly', () => {
+    const propsWithDecimal = {
+      ...defaultProps,
+      values: {
+        homePrice: 400000,
+        downPayment: 15.5,
+        downPaymentType: 'percent'
+      }
+    };
+    
+    render(<InputForm {...propsWithDecimal} />);
+    
+    // Should show dollar equivalent ($62,000) when 15.5% is entered
+    expect(screen.getByText('$62,000')).toBeInTheDocument();
+  });
 });
