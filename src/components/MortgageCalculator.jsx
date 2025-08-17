@@ -119,10 +119,10 @@ export function MortgageCalculator() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-gray-800 mb-2">
-              US Mortgage Calculator
+              Shareable Mortgage Calculator
             </h1>
             <p className="text-gray-600">
-              Calculate your monthly mortgage payments with taxes, insurance, and PMI
+              Calculate your mortgage, then save and share the results with a unique link.
             </p>
           </div>
 
