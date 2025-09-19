@@ -3,6 +3,7 @@ import { InputForm } from './InputForm';
 import { ResultsSummary } from './ResultsSummary';
 import { PaymentBreakdown } from './PaymentBreakdown';
 import { AmortizationTable } from './AmortizationTable';
+import { SellReport } from './SellReport';
 import { ShareButton } from './ShareButton';
 import { useMortgageCalculation } from '../hooks/useMortgageCalculation';
 import { useUrlParams } from '../hooks/useUrlParams';
@@ -19,6 +20,9 @@ export function MortgageCalculator() {
     propertyTax: 0,
     homeInsurance: 0,
     hoaFee: 0,
+    soldAtMonths: 0,
+    avgYearlyReturn: 0,
+    closingFeePercent: 0,
     ...urlParams
   });
 
@@ -147,6 +151,9 @@ export function MortgageCalculator() {
             {/* Right Column - Results */}
             <div className="space-y-6">
               <ResultsSummary results={hasValidInputs ? results : null} />
+              {hasValidInputs && inputs.soldAtMonths > 0 && inputs.avgYearlyReturn > 0 && (
+                <SellReport inputs={inputs} results={results} />
+              )}
               
               {hasValidInputs && (
                 <ShareButton 

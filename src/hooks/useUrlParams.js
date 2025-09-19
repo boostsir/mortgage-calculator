@@ -8,7 +8,10 @@ const PARAM_MAP = {
   term: 'loanTerm',
   tax: 'propertyTax',
   insurance: 'homeInsurance',
-  hoa: 'hoaFee'
+  hoa: 'hoaFee',
+  sellMonths: 'soldAtMonths',
+  avgRet: 'avgYearlyReturn',
+  closeFee: 'closingFeePercent'
 };
 
 const REVERSE_PARAM_MAP = Object.fromEntries(

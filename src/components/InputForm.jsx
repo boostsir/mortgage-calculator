@@ -227,6 +227,66 @@ export function InputForm({ values, onChange, errors = {} }) {
             </div>
           </div>
         </div>
+
+        {/* Sell Scenario (Optional) */}
+        <div className="border-t pt-4 mt-6">
+          <h3 className="text-lg font-semibold mb-4 text-gray-700">Sell Scenario (Optional)</h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label htmlFor="soldAtMonths" className="block text-sm font-medium text-gray-700 mb-1">
+                Sold After (Months)
+              </label>
+              <input
+                id="soldAtMonths"
+                type="number"
+                value={values.soldAtMonths || ''}
+                onChange={(e) => handleInputChange('soldAtMonths', e.target.value)}
+                className={getInputClassName('soldAtMonths')}
+                placeholder="36"
+              />
+              {errors.soldAtMonths && (
+                <p className="text-red-600 text-sm mt-1">{errors.soldAtMonths}</p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="avgYearlyReturn" className="block text-sm font-medium text-gray-700 mb-1">
+                Average Yearly Return (%)
+              </label>
+              <input
+                id="avgYearlyReturn"
+                type="number"
+                step="0.01"
+                value={values.avgYearlyReturn || ''}
+                onChange={(e) => handleInputChange('avgYearlyReturn', e.target.value)}
+                className={getInputClassName('avgYearlyReturn')}
+                placeholder="3"
+              />
+              {errors.avgYearlyReturn && (
+                <p className="text-red-600 text-sm mt-1">{errors.avgYearlyReturn}</p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="closingFeePercent" className="block text-sm font-medium text-gray-700 mb-1">
+                Closing Fee (%)
+              </label>
+              <input
+                id="closingFeePercent"
+                type="number"
+                step="0.01"
+                value={values.closingFeePercent || ''}
+                onChange={(e) => handleInputChange('closingFeePercent', e.target.value)}
+                className={getInputClassName('closingFeePercent')}
+                placeholder="6"
+              />
+              {errors.closingFeePercent && (
+                <p className="text-red-600 text-sm mt-1">{errors.closingFeePercent}</p>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
