@@ -39,3 +39,15 @@
 ## Architecture Notes
 - UI: React components + Tailwind CSS.
 - Domain: mortgage math in `utils/mortgageUtils.js` using `decimal.js` for precision; business logic accessed via hooks.
+
+## Sell Scenario (Optional)
+- Inputs: `soldAtMonths` (months to sell), `avgYearlyReturn` (%), `closingFeePercent` (% of sale price).
+- Panel: `SellReport` renders beneath Results when `soldAtMonths > 0` and `avgYearlyReturn > 0`.
+- Calculations:
+  - Projected Selling Price = `homePrice * (1 + r)^(months/12)` where `r = avgYearlyReturn/100`.
+  - Cash From Sale = `Projected Selling Price - Remaining Balance at month` (from amortization schedule).
+  - Total Cash Invested = `down payment + Total Monthly Payment * months + closing fee`.
+    - Total Monthly Payment includes P&I + PMI + property tax + insurance + HOA.
+    - Closing Fee = `Projected Selling Price * (closingFeePercent/100)`.
+  - Avg Monthly Cost = `(Total Cash Invested - Cash From Sale) / months`.
+ - URL params: `sellMonths`, `avgRet`, `closeFee` map to the above inputs via `useUrlParams`.

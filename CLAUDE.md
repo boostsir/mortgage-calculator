@@ -44,6 +44,10 @@ Never write production code without a failing test first.
    - Home Insurance (optional)
    - HOA Fee (optional)
    - PMI (auto-calculated if down payment <20%)
+   - Sell Scenario (optional):
+     - Sold After (Months)
+     - Average Yearly Return (%)
+     - Closing Fee (%)
 
 2. **Calculation Results:**
    - Monthly Payment (P&I)
@@ -51,6 +55,11 @@ Never write production code without a failing test first.
    - Total Interest Paid
    - Total of Payments
    - Payoff Date
+   - Sell Report (shown when sell inputs provided):
+     - Projected Selling Price
+     - Cash From Sale (price - remaining balance)
+     - Total Cash Invested (down + total monthly outflow × months + closing fee)
+     - Average Monthly Cost
 
 3. **Collapsible Sections:**
    - Monthly Payment Breakdown
@@ -69,6 +78,7 @@ src/
 │   ├── MortgageCalculator.jsx (main component)
 │   ├── InputForm.jsx (all input fields)
 │   ├── ResultsSummary.jsx (primary results display)
+│   ├── SellReport.jsx (sell scenario metrics panel)
 │   ├── PaymentBreakdown.jsx (collapsible breakdown)
 │   ├── AmortizationTable.jsx (collapsible monthly schedule)
 │   └── ShareButton.jsx (URL sharing functionality)
@@ -94,6 +104,7 @@ src/
 3. Test URL parameter handling
 4. Test form validation
 5. Test collapsible section behavior
+6. Test sell scenario computations (selling price, cash from sale, invested total, avg monthly cost)
 
 ### Styling Guidelines
 
@@ -189,3 +200,12 @@ function calculateMonthlyPayment({ homePrice, downPayment, interestRate, loanTer
 - Handle edge cases in calculations
 - Validate all user inputs
 - Maintain accessibility standards
+**Sell Scenario Rules (src/components/SellReport.jsx):**
+- Projected price compounds `avgYearlyReturn` monthly: `P * (1 + r)^(m/12)`.
+- Remaining balance read from amortization schedule at `soldAtMonths`.
+- Closing fee = `projectedPrice * (closingFeePercent/100)`.
+- Total cash invested uses Total Monthly Payment (P&I + taxes/fees) not P&I only.
+- Avg monthly cost = `(invested - cashFromSale) / soldAtMonths`.
+
+**URL Params (src/hooks/useUrlParams.js):**
+- `sellMonths` → `soldAtMonths`, `avgRet` → `avgYearlyReturn`, `closeFee` → `closingFeePercent`.
